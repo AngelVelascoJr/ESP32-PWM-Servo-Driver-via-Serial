@@ -5,8 +5,8 @@ Adafruit_PWMServoDriver ServoDriver = Adafruit_PWMServoDriver(0x40);
 #define Servo0 0
 
 //values ​​obtained after characterizing the servo
-int servo_0[] = {92};
-int servo_180[] = {512};
+int servo_0[] = {92, 92};
+int servo_180[] = {512, 512};
 
 const int BUFFER_SIZE = 100;
 char readedvalues[BUFFER_SIZE];
@@ -31,9 +31,9 @@ void loop()
   if(Serial.available() > 0)
   {
     memset(readedvalues, 0, BUFFER_SIZE); //reset variable with angles
-
     //this code accepts values in format '##,##,##,##E'
     Serial.readBytesUntil('E', readedvalues, BUFFER_SIZE);
+    //Feedback();
     char* diff = strtok(readedvalues, ",");
     int count = 0;
     ValuesRecieved = 0;
@@ -42,6 +42,7 @@ void loop()
     while(diff != NULL && count < 16)
     {
       ServoValues[count] = atoi(diff);
+      //Serial.println(diff);
       count++;
       ValuesRecieved++;
       diff = strtok(NULL, ",");
@@ -49,14 +50,25 @@ void loop()
     count = 0;
     while (count < ValuesRecieved)
     {
+      //Serial.println(count);
       MoveServo(count, ServoValues[count]);
       count++;
     }
   }
 }
 
+void Feedback()
+{
+  String RetMessage = String(readedvalues);
+  RetMessage.concat("E");
+  Serial.println(RetMessage);
+}
+
 void MoveServo(int num_servo, float angle)
 {
+
+  if(num_servo >= sizeof(servo_180) && num_servo >= sizeof(servo_0))
+    return;
   int low = ((servo_180[num_servo]-servo_0[num_servo])/180.0)*angle + servo_0[num_servo];
   ServoDriver.setPWM(num_servo, 0, low);
 }
