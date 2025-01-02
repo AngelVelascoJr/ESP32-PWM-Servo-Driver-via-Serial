@@ -20,7 +20,8 @@ int ValuesRecieved = 0;
 void setup() 
 {
   //Wire.begin(I2C_SDA, I2C_SCL); //uncoment this line if you want to use diferent pins for I2C comunication
-  Serial.begin(9600);
+  Wire.setClock(400000);
+  Serial.begin(115200);
   ServoDriver.begin();
   ServoDriver.setPWMFreq(50); //50 ms PWM period for MG996r
 }
@@ -31,18 +32,13 @@ void loop()
   {
     memset(readedvalues, 0, BUFFER_SIZE); //reset variable with angles
 
-    //this code accepts values in format '##,##,##,##\n'
-    Serial.readBytesUntil('\n', readedvalues, BUFFER_SIZE);
+    //this code accepts values in format '##,##,##,##E'
+    Serial.readBytesUntil('E', readedvalues, BUFFER_SIZE);
     char* diff = strtok(readedvalues, ",");
-    char* earlyEnd = strchr(diff, '\n');
-    if(earlyEnd != nullptr)
-    {
-      *earlyEnd = 0x00;
-    }
     int count = 0;
     ValuesRecieved = 0;
-    Serial.println(readedvalues);
-    Serial.println(diff);
+    //Serial.println(readedvalues); //debug lines
+    //Serial.println(diff);
     while(diff != NULL && count < 16)
     {
       ServoValues[count] = atoi(diff);
