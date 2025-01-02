@@ -29,12 +29,20 @@ void loop()
 {
   if(Serial.available() > 0)
   {
+    memset(readedvalues, 0, BUFFER_SIZE); //reset variable with angles
+
     //this code accepts values in format '##,##,##,##\n'
     Serial.readBytesUntil('\n', readedvalues, BUFFER_SIZE);
-    char* found = strtok(readedvalues,",");
     char* diff = strtok(readedvalues, ",");
+    char* earlyEnd = strchr(diff, '\n');
+    if(earlyEnd != nullptr)
+    {
+      *earlyEnd = 0x00;
+    }
     int count = 0;
     ValuesRecieved = 0;
+    Serial.println(readedvalues);
+    Serial.println(diff);
     while(diff != NULL && count < 16)
     {
       ServoValues[count] = atoi(diff);
