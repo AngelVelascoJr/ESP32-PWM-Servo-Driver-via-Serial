@@ -5,8 +5,8 @@ Adafruit_PWMServoDriver ServoDriver = Adafruit_PWMServoDriver(0x40);
 #define Servo0 0
 
 //values ​​obtained after characterizing the servo
-int servo_0[] = {92, 92};
-int servo_180[] = {512, 512};
+int servo_0[] = {92, 92, 82};
+int servo_180[] = {512, 512, 512};
 
 const int BUFFER_SIZE = 100;
 char readedvalues[BUFFER_SIZE];
@@ -24,6 +24,12 @@ void setup()
   Serial.begin(115200);
   ServoDriver.begin();
   ServoDriver.setPWMFreq(50); //50 ms PWM period for MG996r
+
+  for(int i = 0; i < sizeof(servo_0); i++)
+  {
+    MoveServo(i, 0);
+  }
+
 }
 
 void loop() 
