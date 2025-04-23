@@ -5,8 +5,11 @@ Adafruit_PWMServoDriver ServoDriver = Adafruit_PWMServoDriver(0x40);
 #define Servo0 0
 
 //values ​​obtained after characterizing the servo
-int servo_0[] = {92, 92, 82};
-int servo_180[] = {512, 512, 512};
+int servo_N90[] = {92, 92, 82};
+int servo_90[] = {512, 512, 512};
+
+const int MIN_SERVO[] = {-90,-90,-90};
+const int MAX_SERVO[] = {90,90,90};
 
 const int BUFFER_SIZE = 100;
 char readedvalues[BUFFER_SIZE];
@@ -25,11 +28,11 @@ void setup()
   ServoDriver.begin();
   ServoDriver.setPWMFreq(50); //50 ms PWM period for MG996r
 
-  for(int i = 0; i < sizeof(servo_0); i++)
+  for(int i = 0; i < sizeof(servo_N90); i++)
   {
     MoveServo(i, 0);
   }
-
+  
 }
 
 void loop() 
@@ -72,9 +75,9 @@ void Feedback()
 
 void MoveServo(int num_servo, float angle)
 {
-
-  if(num_servo >= sizeof(servo_180) && num_servo >= sizeof(servo_0))
+  if(num_servo >= sizeof(servo_90) && num_servo >= sizeof(servo_N90))
     return;
+  angle = clamp(angle, MIN_SERVO[num_servo], MAX_SERVO[num_servo]);
   int low = ((servo_180[num_servo]-servo_0[num_servo])/180.0)*angle + servo_0[num_servo];
   ServoDriver.setPWM(num_servo, 0, low);
 }
